@@ -1,15 +1,28 @@
 <?php
 
+use App\Http\Controllers\Ads\AdController;
+use App\Http\Controllers\Guests\GuestAdController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+// Guest Show Single Ad Route (route-model binding)
+Route::get('/guests/ads/{ad}', [GuestAdController::class, 'show'])->name('guests.ads.show');
+
+// Ad Creation Route
+Route::get('/ads/create', [AdController::class, 'create'])->name('ads.create');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/ads/{ad}', [AdController::class, 'show'])->name('ads.show');
+    Route::post('/ads/{ad}/toggle-availability', [AdController::class, 'toggleAvailability'])->name('ads.toggle-availability');
+    Route::post('/ads/{ad}/toggle-active', [AdController::class, 'toggleActive'])->name('ads.toggle-active');
+    Route::delete('/ads/{ad}', [AdController::class, 'destroy'])->name('ads.destroy');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', function () {
+    return view('home');
+});
+
+Route::get('/dashboard', function () {return view('dashboard');})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

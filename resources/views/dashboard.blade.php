@@ -1,17 +1,43 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="fw-semibold fs-4 text-dark">
             {{ __('Dashboard') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+    <div class="container mt-5 bg-white p-4 rounded">
+        <div class="p-4 text-dark">
+            @if (session('status'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('status') }}
+                </div>
+            @endif
+                    
+            <div class="row mt-3">
+                <div class="col-10">
                     {{ __("You're logged in!") }}
                 </div>
+
+                <div class="col-2 text-end">
+                    <a href="{{ route('ads.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus me-1"></i>
+                        {{ __('Create New Ad') }}
+                    </a>
+                </div>
             </div>
+                    
+            <!-- Split the view in half to show the create ad form -->
+            <div class="row mt-3">
+
+                <!-- Liste over ads som brukeren har laget ifra før -->
+                <div class="col-md-12">
+                    <div class="mt-6">
+                        <livewire:ads.ads-list />
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
 </x-app-layout>
