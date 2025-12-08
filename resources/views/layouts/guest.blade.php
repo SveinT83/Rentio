@@ -25,6 +25,10 @@
             {{ $slot }}
         </main>
 
+        <div class="container-fluid text-bg-dark py-4 mt-5">
+            <x-footer />
+        </div>
+
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
          @endif
