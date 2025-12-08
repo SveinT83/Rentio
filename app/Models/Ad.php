@@ -19,10 +19,23 @@ class Ad extends Model
         'category_id',
         'subcategory_id',
         'location',
+        'municipality',
         'images',
         'is_active',
         'is_available',
     ];
+
+    public function views(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\AdView::class);
+    }
+
+    public function scopeWithRecentViewsCount($query, int $days = 7)
+    {
+        return $query->withCount(['views as recent_views_count' => function ($q) use ($days): void {
+            $q->where('view_date', '>=', now()->subDays($days)->toDateString());
+        }]);
+    }
 
     public function casts(): array
     {

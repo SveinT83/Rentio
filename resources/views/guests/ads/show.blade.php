@@ -103,6 +103,9 @@
                         </div> <!-- End Row -->
                     </div> <!-- End Card Footer -->
                 </div> <!-- End Ad Card -->
+
+                <livewire:guests.ads.AdsList />
+                
             </div> <!-- End Ad Card Column -->
 
             <!-- ----------------------------------------------------------------------- -->

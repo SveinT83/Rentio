@@ -1,35 +1,76 @@
 <div>
-    <div class="mb-3">
-        <div class="row g-2 align-items-end">
-            <div class="col-12 col-md-3">
-                <label class="form-label">{{ __('Category') }}</label>
-                <input type="number" class="form-control" wire:model.lazy="categoryId" placeholder="ID" />
-            </div>
-            <div class="col-12 col-md-3">
-                <label class="form-label">{{ __('Subcategory') }}</label>
-                <input type="number" class="form-control" wire:model.lazy="subcategoryId" placeholder="ID" />
-            </div>
-            <div class="col-12 col-md-3">
-                <label class="form-label">{{ __('Location') }}</label>
-                <input type="text" class="form-control" wire:model.lazy="location" placeholder="{{ __('City/Town') }}" />
-            </div>
-            <div class="col-12 col-md-3 text-end">
-                <button class="btn btn-outline-secondary" wire:click="$set('categoryId', null); $set('subcategoryId', null); $set('location', null)">
-                    <i class="bi bi-x-circle me-1"></i>{{ __('Clear Filters') }}
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="row justify-content-center">
+    <div class="row">
         
         @forelse($ads as $ad)
             
-            <x-guests.ad-card :ad="$ad" />
+            <div class="col-md-6">
+                <x-guests.ad-card :ad="$ad" />
+            </div>
 
 
         @empty
-            {{ __('No ads yet') }}
+            <div class="col-12 text-center py-5">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    {{ __('No ads found matching your criteria') }}
+                </div>
+            </div>
         @endforelse
     </div>
+
+    @if($ads->count() > 0)
+        <!-- Load More / Statistics Section -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                
+                <!-- Statistics -->
+                <p class="text-muted small mb-3">
+                    {{ __('Showing :current of :total ads', ['current' => $currentlyShowing, 'total' => $totalAvailable]) }}
+                </p>
+
+                <!-- Load More Button -->
+                @if($hasMoreAds)
+                    <button 
+                        wire:click="loadMore" 
+                        class="btn btn-outline-primary" 
+                        wire:loading.attr="disabled"
+                        wire:loading.class="btn-outline-secondary"
+                    >
+                        <span wire:loading.remove wire:target="loadMore">
+                            <i class="bi bi-arrow-down-circle me-2"></i>
+                            {{ __('Load More Ads') }}
+                        </span>
+                        <span wire:loading wire:target="loadMore">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            {{ __('Loading...') }}
+                        </span>
+                    </button>
+
+                    <!-- Optional: Infinite Scroll -->
+                    <div 
+                        x-data="{
+                            init() {
+                                let observer = new IntersectionObserver((entries) => {
+                                    entries.forEach(entry => {
+                                        if (entry.isIntersecting) {
+                                            @this.loadMore();
+                                        }
+                                    });
+                                });
+                                observer.observe(this.$el);
+                            }
+                        }"
+                        class="invisible"
+                        style="height: 200px;"
+                    ></div>
+                @else
+                    <p class="text-muted">
+                        <i class="bi bi-check-circle me-2"></i>
+                        {{ __('All ads have been loaded') }}
+                    </p>
+                @endif
+                
+            </div>
+        </div>
+    @endif
 </div>

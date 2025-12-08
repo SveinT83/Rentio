@@ -1,0 +1,36 @@
+{
+  "Ads": "Annonser",
+  "Top Ads": "Toppannonser",
+  "No popular ads yet": "Ingen populære annonser ennå",
+
+  "No ads found matching your criteria": "Ingen annonser matcher kriteriene",
+  "Showing :current of :total ads": "Viser :current av :total annonser",
+  "Load More Ads": "Last inn flere annonser",
+  "Loading...": "Laster …",
+  "All ads have been loaded": "Alle annonser er lastet",
+
+  "Unknown location": "Ukjent sted",
+  "Search ads...": "Søk i annonser …",
+
+  "Category": "Kategori",
+  "All categories": "Alle kategorier",
+  "Subcategory": "Underkategori",
+  "All subcategories": "Alle underkategorier",
+  "Location": "Sted",
+  "Municipality": "Kommune",
+  "Clear Filters": "Tøm filter",
+
+  "Home": "Hjem",
+  "Dashboard": "Dashbord",
+  "Profile": "Profil",
+  "Log Out": "Logg ut",
+  "Log in": "Logg inn",
+  "Register": "Registrer deg",
+
+  "Back": "Tilbake",
+  "Unknown category": "Ukjent kategori",
+  "Contact": "Kontakt",
+  "Posted": "Publisert",
+  "Updated": "Oppdatert",
+  "View Profile": "Se profil"
+}
