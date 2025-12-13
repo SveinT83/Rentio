@@ -44,9 +44,9 @@
 						{{ __($ad->price_period) }}
 					</td>
 					<td class="text-end">
-						<button class="btn btn-outline-secondary btn-sm" wire:click="$dispatch('edit-ad', { id: {{ $ad->id }} })">
+						<a class="btn btn-outline-secondary btn-sm" href="{{ route('ads.show', $ad->id) }}" >
 							<i class="bi bi-pencil-square me-1"></i>{{ __('Edit') }}
-						</button>
+						</a>
 					</td>
 				</tr>
 			@empty

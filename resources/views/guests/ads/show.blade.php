@@ -1,3 +1,9 @@
+<!-- --------------------------------------------------------------------- -->
+<!-- Show AD to guests                                                     -->
+<!-- Route: guests.ads.show                                                -->
+<!-- Controller: Guests\GuestAdController@show                                 -->
+<!-- --------------------------------------------------------------------- -->
+
 <x-guest-layout>
     <div class="container my-4">
 
@@ -37,7 +43,7 @@
                             <div class="col-md-6">
 
                                 <img src="https://via.placeholder.com/600x400" class="img-fluid rounded" alt="Ad Image">
-                                
+
                             </div> <!-- Image END -->
 
                             <!-- ------------------------------- -->
@@ -70,17 +76,34 @@
                                 </div>
 
                                 <!-- Contact Annonsør Button to the right-->
+                                @php
+                                    $settings = $ad->user->settings;
+                                @endphp
+
                                 <div class="row">
-                                    <a href="mailto:{{ $ad->user?->email ?? '—' }}?subject={{ urlencode('Forespørsel av din annonse: ' . $ad->ad_name) }}"
-                                        class="btn btn-primary">
-                                        <i class="bi bi-envelope-fill me-1"></i>
-                                        {{ __('Contact') }} {{ $ad->user?->name ?? '—' }}
-                                    </a>
+
+                                    <!-- Show tel if allowed in settings and tel is filled -->
+                                    @if(($settings->show_tel ?? false) && filled($ad->user->tel))
+                                        <a href="tel:{{ $ad->user->tel ?? '—' }}"
+                                            class="btn btn-primary mb-2">
+                                            <i class="bi bi-telephone-fill"></i>
+                                            {{ $ad->user->tel ?? '—' }}
+                                        </a>
+                                    @endif
+
+                                    <!-- Show email if allowed in settings and email is filled -->
+                                    @if(($settings->show_email ?? false) && filled($ad->user->email))
+                                        <a href="mailto:{{ $ad->user?->email ?? '—' }}?subject={{ urlencode('Forespørsel av din annonse: ' . $ad->ad_name) }}"
+                                            class="btn btn-primary mb-1">
+                                            <i class="bi bi-envelope-fill me-1"></i>
+                                            {{ __('E-mail to') }} {{ $ad->user?->name ?? '—' }}
+                                        </a>
+                                    @endif
                                 </div> <!-- Contact Annonsør Button END -->
                             </div> <!-- Ad END -->
                         </div>
                     </div> <!-- End Card Body -->
-                    
+
                     <!-- ------------------------------- -->
                     <!-- Card Footer -->
                     <!-- ------------------------------- -->
@@ -105,7 +128,7 @@
                 </div> <!-- End Ad Card -->
 
                 <livewire:guests.ads.AdsList />
-                
+
             </div> <!-- End Ad Card Column -->
 
             <!-- ----------------------------------------------------------------------- -->

@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'tel',
         'password',
     ];
 
@@ -45,4 +46,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function settings()
+    {
+        return $this->hasOne(UserSetting::class);
+    }
+
 }

@@ -6,9 +6,22 @@
     <!-- ------------------------------- -->
     <!-- Logo whith link to homepage -->
     <!-- ------------------------------- -->
-    <div class="col-md-6 mt-1">
+    <div class="col-md-2 mt-1">
         <a href="/">
             <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+        </a>
+    </div>
+
+    <!-- ------------------------------- -->
+    <!-- Slim “info-stripe” -->
+    <!-- ------------------------------- -->
+    <div class="col-md-4 d-flex align-items-center justify-content-center gap-2">
+        <span class="text-muted small">
+            Rimelig for leietaker. Lønnsomt for utleier. Enkel utleie med Rentio.
+        </span>
+
+        <a href="{{ route('price') }}" class="small text-decoration-none">
+            {{ __('Se priser →') }}
         </a>
     </div>
 

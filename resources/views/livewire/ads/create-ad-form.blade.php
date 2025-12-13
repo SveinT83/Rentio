@@ -66,6 +66,12 @@
 
         </div>
 
+        <!-- Image -->
+        <div class="mb-3">
+            <label for="imageUpload" class="form-label">{{ __('Image') }}</label>
+            <input type="file" class="form-control" id="imageUpload" wire:model="imageUpload">
+        </div>
+
         <!-- Description -->
         <div class="mb-3">
             <label for="description" class="form-label">{{ __('Description') }}</label>

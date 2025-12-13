@@ -14,8 +14,11 @@ class GuestAdController extends Controller
 {
     public function show(Ad $ad): View
     {
-
-        $ad->load(['category', 'subcategory', 'user']);
+        $ad->load([
+            'category',
+            'subcategory',
+            'user.settings',
+        ]);
 
         return view('guests.ads.show', [
             'ad' => $ad,
