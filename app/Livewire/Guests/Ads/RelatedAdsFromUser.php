@@ -15,7 +15,7 @@ class RelatedAdsFromUser extends Component
     public function render(): View
     {
         $ads = Ad::query()
-            ->with(['category', 'subcategory'])
+            ->with(['category', 'subcategory', 'primaryImage'])
             ->where('user_id', $this->userId)
             ->where('is_active', true)
             ->where('is_available', true)

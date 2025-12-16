@@ -212,7 +212,7 @@ class AdsList extends Component
 
         // Get ads with relationships
         $ads = $baseQuery
-            ->with(['user', 'category', 'subcategory'])
+            ->with(['user', 'category', 'subcategory', 'primaryImage'])
             ->orderBy($this->sortBy, $this->sortDir)
             ->limit($totalAdsToShow)
             ->get();

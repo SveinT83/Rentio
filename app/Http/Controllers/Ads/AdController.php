@@ -18,6 +18,15 @@ class AdController extends Controller
         return view('ads.create');
     }
 
+    public function edit(Ad $ad): View
+    {
+        $this->authorizeOwner($ad);
+
+        return view('ads.create', [
+            'ad' => $ad,
+        ]);
+    }
+
     public function show(Ad $ad): View
     {
         $this->authorizeOwner($ad);

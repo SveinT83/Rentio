@@ -7,14 +7,14 @@
 
     <div class="row justify-content-between">
         <div class="col-auto">
-            <h3 class="mb-3">{{ __('Create New Ad') }}</h3>
+            <h3 class="mb-3">{{ isset($ad) ? __('Edit Ad') : __('Create New Ad') }}</h3>
         </div>
         <div class="col-auto">
             <a class="btn btn-outline-secondary btn-sm" href="{{ route('dashboard') }}"><i class="bi bi-arrow-counterclockwise"></i> {{ __('Back to Dashboard') }}</a>
         </div>
     </div>
 
-    <livewire:ads.create-ad-form />
+    <livewire:ads.create-ad-form :ad-id="isset($ad) ? $ad->id : null" />
 
 
 </x-app-layout>

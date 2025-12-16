@@ -66,11 +66,57 @@
 
         </div>
 
-        <!-- Image -->
+        <!-- Images -->
         <div class="mb-3">
-            <label for="imageUpload" class="form-label">{{ __('Image') }}</label>
-            <input type="file" class="form-control" id="imageUpload" wire:model="imageUpload">
+            <label for="imageUploads" class="form-label">{{ __('Images') }}</label>
+            <input type="file" multiple class="form-control" id="imageUploads" wire:model="imageUploads">
+            @error('imageUploads.*')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+
+            <!-- New upload previews -->
+            <div class="row mt-3 g-3">
+                @foreach($imageUploads as $idx => $upload)
+                    <div class="col-6 col-md-3">
+                        <div class="border rounded p-2 d-flex flex-column align-items-center gap-2">
+                            <img src="{{ $upload->temporaryUrl() }}" alt="preview" class="img-fluid" />
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="primaryUpload" id="primaryUpload{{ $idx }}" value="{{ $idx }}" wire:model="primaryUploadIndex">
+                                <label class="form-check-label" for="primaryUpload{{ $idx }}">{{ __('Set primary') }}</label>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
+
+        @if($adId)
+            <!-- Existing images -->
+            <div class="mb-3">
+                <label class="form-label">{{ __('Existing Images') }}</label>
+                <div class="row g-3">
+                    @forelse($existingImages as $image)
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-2 d-flex flex-column gap-2">
+                                <img src="{{ asset('storage/'.$image->path) }}" alt="image" class="img-fluid" />
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm" wire:click="removeImage({{ $image->id }})">
+                                        <i class="bi bi-trash"></i>
+                                        {{ __('Remove') }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" wire:click="setPrimary({{ $image->id }})" @if($image->is_primary) disabled @endif>
+                                        <i class="bi bi-star"></i>
+                                        {{ $image->is_primary ? __('Primary') : __('Set primary') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-muted">{{ __('No images uploaded yet.') }}</div>
+                    @endforelse
+                </div>
+            </div>
+        @endif
 
         <!-- Description -->
         <div class="mb-3">

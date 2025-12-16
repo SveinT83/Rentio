@@ -11,9 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use App\Models\AdImage;
+use Illuminate\Support\Facades\Storage;
 
 class CreateAdForm extends Component
 {
+    use WithFileUploads;
     public Collection $categories;
 
     public ?string $adName = null;
@@ -36,6 +40,16 @@ class CreateAdForm extends Component
 
     public ?int $adId = null;
 
+    /**
+     * Temporary uploaded files before persisting
+     */
+    public array $imageUploads = [];
+
+    /**
+     * Selected primary image index among new uploads
+     */
+    public ?int $primaryUploadIndex = null;
+
     public function mount(?int $adId = null): void
     {
         $this->categories = AdCategory::query()
@@ -44,6 +58,16 @@ class CreateAdForm extends Component
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
+
+        // If adId not explicitly passed, try to read from route (e.g., /ads/{ad})
+        if ($adId === null) {
+            $routeAd = request()->route('ad');
+            if ($routeAd instanceof \App\Models\Ad) {
+                $adId = $routeAd->id;
+            } elseif (is_numeric($routeAd)) {
+                $adId = (int) $routeAd;
+            }
+        }
 
         if ($adId) {
             $this->loadAd($adId);
@@ -73,9 +97,19 @@ class CreateAdForm extends Component
 
     public function render(): View
     {
+        $existingImages = collect();
+        if ($this->adId) {
+            $existingImages = AdImage::query()
+                ->where('ad_id', $this->adId)
+                ->orderByDesc('is_primary')
+                ->orderBy('sort_order')
+                ->get();
+        }
+
         return view('livewire.ads.create-ad-form', [
             'children' => $this->children,
             'locationSuggestions' => $this->locationSuggestions(),
+            'existingImages' => $existingImages,
         ]);
     }
 
@@ -120,6 +154,8 @@ class CreateAdForm extends Component
             'location' => ['nullable', 'string', 'max:255'],
             'category' => ['required', 'integer', Rule::exists('ad_categories', 'id')->where(fn ($q) => $q->whereNull('parent_id'))],
             'subcategory' => ['nullable', 'integer', Rule::exists('ad_categories', 'id')->where(fn ($q) => $q->where('parent_id', $this->category))],
+            // Allow up to 10MB per image; ensure php.ini post/upload limits match
+            'imageUploads.*' => ['nullable', 'image', 'max:10240'],
         ]);
 
         $user = Auth::user();
@@ -137,9 +173,11 @@ class CreateAdForm extends Component
                 'subcategory_id' => $validated['subcategory'] ?? null,
                 'location' => $validated['location'] ?? null,
             ]);
+
+            $this->persistUploads($ad);
             $this->dispatch('ad-updated');
         } else {
-            Ad::query()->create([
+            $ad = Ad::query()->create([
                 'user_id' => $user->id,
                 'ad_name' => $validated['adName'],
                 'price' => $validated['price'],
@@ -150,6 +188,7 @@ class CreateAdForm extends Component
                 'location' => $validated['location'] ?? null,
                 'images' => [],
             ]);
+            $this->persistUploads($ad);
             $this->dispatch('ad-created');
             // Flash success for dashboard
             session()->flash('status', __('Ad saved successfully'));
@@ -157,7 +196,37 @@ class CreateAdForm extends Component
             $this->redirectRoute('dashboard');
         }
 
-        $this->reset(['adId', 'adName', 'price', 'pricePeriod', 'description', 'category', 'subcategory', 'location', 'locationQuery']);
+        $this->reset(['adId', 'adName', 'price', 'pricePeriod', 'description', 'category', 'subcategory', 'location', 'locationQuery', 'imageUploads', 'primaryUploadIndex']);
+    }
+
+    protected function persistUploads(Ad $ad): void
+    {
+        if (count($this->imageUploads) === 0) {
+            return;
+        }
+
+        $nextSort = (int) ($ad->images()->max('sort_order') ?? 0);
+
+        foreach ($this->imageUploads as $index => $file) {
+            $path = $file->store('ad-images/'.$ad->id, 'public');
+            $isPrimary = $this->primaryUploadIndex !== null
+                ? ($index === $this->primaryUploadIndex)
+                : ($nextSort === 0 && $index === 0 && $ad->primaryImage()->doesntExist());
+
+            $ad->images()->create([
+                'path' => $path,
+                'is_primary' => $isPrimary,
+                'sort_order' => ++$nextSort,
+            ]);
+        }
+
+        // Ensure only one primary image
+        if ($this->primaryUploadIndex !== null) {
+            $primary = $ad->images()->latest()->skip(count($this->imageUploads) - ($this->primaryUploadIndex + 1))->take(1)->first();
+            if ($primary) {
+                $ad->images()->where('id', '!=', $primary->id)->update(['is_primary' => false]);
+            }
+        }
     }
 
     #[On('edit-ad')]
@@ -178,5 +247,30 @@ class CreateAdForm extends Component
         $this->subcategory = $ad->subcategory_id;
         $this->location = $ad->location;
         $this->locationQuery = $ad->location;
+    }
+
+    public function removeImage(int $imageId): void
+    {
+        $user = Auth::user();
+        if (! $user || ! $this->adId) {
+            abort(403);
+        }
+
+        $ad = Ad::query()->forUser($user->id)->findOrFail($this->adId);
+        $image = $ad->images()->findOrFail($imageId);
+        Storage::disk('public')->delete($image->path);
+        $image->delete();
+    }
+
+    public function setPrimary(int $imageId): void
+    {
+        $user = Auth::user();
+        if (! $user || ! $this->adId) {
+            abort(403);
+        }
+
+        $ad = Ad::query()->forUser($user->id)->findOrFail($this->adId);
+        $ad->images()->update(['is_primary' => false]);
+        $ad->images()->where('id', $imageId)->update(['is_primary' => true]);
     }
 }

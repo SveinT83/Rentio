@@ -1,5 +1,5 @@
 <a href="{{ route('guests.ads.show', $ad->id) }}" class="card m-2 p-0">
-    <img src="https://placehold.co/200" class="card-img-top" alt="...">
+    <img src="{{ $ad->primaryImage ? asset('storage/'.$ad->primaryImage->path) : 'https://placehold.co/200' }}" class="card-img-top" style="aspect-ratio:1/1;object-fit:cover;object-position:center;" alt="{{ $ad->ad_name }}">
 
     <!-- Card Body -->
     <div class="card-body">

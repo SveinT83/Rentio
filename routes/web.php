@@ -22,6 +22,7 @@ Route::get('/gdpr', function () {return view('/guests.div.gdpr');})->name('gdpr'
 Route::get('/ads/create', [AdController::class, 'create'])->name('ads.create');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/ads/{ad}/edit', [AdController::class, 'edit'])->name('ads.edit');
     Route::get('/ads/{ad}', [AdController::class, 'show'])->name('ads.show');
     Route::post('/ads/{ad}/toggle-availability', [AdController::class, 'toggleAvailability'])->name('ads.toggle-availability');
     Route::post('/ads/{ad}/toggle-active', [AdController::class, 'toggleActive'])->name('ads.toggle-active');
@@ -30,6 +31,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/', function () {
     $popularAds = \App\Models\Ad::query()
+        ->with('primaryImage')
         ->withRecentViewsCount(7)
         ->orderByDesc('recent_views_count')
         ->limit(3)
