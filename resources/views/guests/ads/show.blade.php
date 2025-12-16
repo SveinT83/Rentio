@@ -42,7 +42,12 @@
                             <!-- ------------------------------- -->
                             <div class="col-md-6">
 
-                                <img src="https://via.placeholder.com/600x400" class="img-fluid rounded" alt="Ad Image">
+                                <img 
+                                    src="{{ $ad->primaryImage ? asset('storage/'.$ad->primaryImage->path) : 'https://placehold.co/600' }}" 
+                                    class="img-fluid rounded"
+                                    style="aspect-ratio:1/1;object-fit:cover;object-position:center;"
+                                    alt="{{ $ad->ad_name }}"
+                                >
 
                             </div> <!-- Image END -->
 
